@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const PORT = 8080; //default port 8080
 
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({extended: true}));
+
 app.set('view engine', 'ejs');
 
 const urlDatabase = {
@@ -9,9 +12,22 @@ const urlDatabase = {
   '9sm5xk': 'http://www.google.com'
 };
 
+function generateRandomString(){
+  return Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);
+}
+
+app.post('/urls',(req,res) =>{
+  console.log(req.body);
+  res.send('OK');
+});
+
+app.get('/urls/new',(req, res) =>{
+  res.render('urls_new');
+});
+
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase };
-  res.render('./url_index', templateVars);
+  res.render('url_index', templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
