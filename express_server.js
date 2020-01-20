@@ -22,7 +22,6 @@ app.post('/urls', (req, res) => {
   urlDatabase[short] = req.body.longURL;
   let newURL = `/urls/${short}`;
   res.redirect(newURL);
-  // res.send('OK');
 });
 
 app.get('/urls/new', (req, res) => {
