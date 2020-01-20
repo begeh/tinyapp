@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/begeh/tinyapp/issues"
   },
-  "homepage": "https://github.com/begeh/tinyapp#readme"
+  "homepage": "https://github.com/begeh/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
