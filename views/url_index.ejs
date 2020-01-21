@@ -24,6 +24,9 @@
           <tr>
             <td><%= url %></td>
             <td><%= urls[url] %></td>
+            <td>
+              <a href='/urls/<%=url%>' style = 'color:blue; background-color:white; border-color: blue'class='btn btn-primary' role='button'>Edit</a>
+            </td>
             <td> 
               <form method="POST" action="/urls/<%=url%>/delete">
               <button type="submit" style = "background-color:white; border-color:red; color:red" class="btn btn-primary">Delete</button>
