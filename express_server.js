@@ -17,7 +17,6 @@ function generateRandomString() {
 }
 
 app.post('/urls', (req, res) => {
-  console.log(req.body);
   let short = generateRandomString();
   urlDatabase[short] = req.body.longURL;
   let newURL = `/urls/${short}`;
@@ -33,9 +32,15 @@ app.get('/urls', (req, res) => {
   res.render('url_index', templateVars);
 });
 
+app.post('/urls/:shortURL/delete', (req,res) =>{
+  delete urlDatabase[req.params.shortURL];
+  res.redirect('/urls');
+});
+
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   if (templateVars.longURL === undefined) {
+    res.status(404);
     res.render("url_error");
   }
   res.render("urls_show", templateVars);
@@ -56,6 +61,10 @@ app.get('/urls-json', (req, res) => {
 
 app.get('/hello', (req, res) => {
   res.send('<html><body>Hello <b>World</b></body></html>\n');
+});
+
+app.post('/urls/:shortURL/delete', (req, res) =>{
+
 });
 
 app.listen(PORT, () => {
