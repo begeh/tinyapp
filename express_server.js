@@ -10,8 +10,8 @@ app.use(cookieParser());
 app.set('view engine', 'ejs');
 
 const urlDatabase = {
-  'bzxVn2': 'http://www.lighthouselabs.ca',
-  '9sm5xk': 'http://www.google.com'
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: 'aJ48lW'},
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 
 const users = {
@@ -40,6 +40,17 @@ const validateUser = (email) => {
   }
   return false;
 }
+
+const urlsForUser = (id) =>{
+  let keys = Object.keys(urlDatabase);
+  let obj ={};
+  for(item of keys){
+    if(urlDatabase[item].userID === id){
+      obj[item] = urlDatabase[item];
+    }
+  }
+  return obj;
+};
 
 app.post('/register', (req, res) => {
   if (req.body.email === '' || req.body.password === '') {
@@ -77,8 +88,9 @@ app.get('/urls/new', (req, res) => {
 
 app.get('/urls', (req, res) => {
   let user_id = req.cookies.user_id;
+  let newUrlList =  urlsForUser(user_id);
   let templateVars = {
-    urls: urlDatabase,
+    urls: newUrlList,
     user_id: users[user_id]
   };
   res.render('url_index', templateVars);
@@ -116,8 +128,10 @@ app.get('/hello', (req, res) => {
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect('/urls');
+  if(urlDatabase.shortURL.userID === req.cookies['url_id']){
+    delete urlDatabase[req.params.shortURL];
+    res.redirect('/urls');
+  }
 });
 
 app.post('/urls/:shortURL', (req, res) => {

@@ -13,6 +13,7 @@
 
 <body>
   <%- include('./partials/_header'); -%>
+  <% if(user_id){ %>
   <main style="margin: 1em;">
     <h3>My URLs</h3>
     <table class="table">
@@ -28,7 +29,7 @@
         <% for(let url in urls) { %>
         <tr>
           <td><%= url %></td>
-          <td><%= urls[url] %></td>
+          <td><%= urls[url].longURL %></td>
           <td>
             <a href='/urls/<%=url%>' style='color:blue; background-color:white; border-color: blue'
               class='btn btn-primary' role='button'>Edit</a>
@@ -40,6 +41,9 @@
             </form>
           </td>
         </tr>
+        <% } %>
+      <% } else { %>
+        <h3 style = 'padding: 3em;'>Please register or login to see your URL list</h3>
         <% } %>
       </tbody>
     </table>
