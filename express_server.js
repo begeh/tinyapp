@@ -35,7 +35,7 @@ const validateUser = (email) => {
   let keys = Object.keys(users);
   for (item of keys) {
     if (users[item].email === email) {
-      return true
+      return item;
     }
   }
   return false;
@@ -69,7 +69,7 @@ app.post('/urls', (req, res) => {
 app.get('/urls/new', (req, res) => {
   // let templateVars = { username: req.cookies['username'] };
   let user_id = req.cookies.user_id;
-  let templateVars ={ user_id : users[user_id]};
+  let templateVars = { user_id: users[user_id] };
   res.render('urls_new', templateVars);
 });
 
@@ -77,7 +77,7 @@ app.get('/urls', (req, res) => {
   let user_id = req.cookies.user_id;
   let templateVars = {
     urls: urlDatabase,
-    user_id : users[user_id]
+    user_id: users[user_id]
   };
   res.render('url_index', templateVars);
 });
@@ -88,7 +88,7 @@ app.get("/urls/:shortURL", (req, res) => {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
     // username: req.cookies['username']
-    user_id : users[user_id]
+    user_id: users[user_id]
   };
   if (templateVars.longURL === undefined) {
     res.status(404);
@@ -124,15 +124,26 @@ app.post('/urls/:shortURL', (req, res) => {
   res.redirect('/urls');
 });
 
-app.get('/login',(req,res) =>{
+app.get('/login', (req, res) => {
   let user_id = req.cookies.user_id;
-  let templateVars ={ user_id : users[user_id]};
-  res.render('login',templateVars);
+  let templateVars = { user_id: users[user_id] };
+  res.render('login', templateVars);
 });
 
 app.post('/login', (req, res) => {
-  res.cookie('user_id', req.body.user_id);
-  res.redirect('/urls');
+  if (validateUser(req.body.email)) {
+    if (req.body.password === users[validateUser(req.body.email)].password) {
+      res.cookie('user_id', validateUser(req.body.email));
+      res.redirect('/urls');
+    } else {
+      res.statusCode = 403;
+      res.send('ERROR 403: Password does not match')
+    }
+  } else {
+    res.statusCode = 403;
+    res.send("ERROR 403: Incomplete/incorrect credentials");
+  }
+
 });
 
 app.post('/logout', (req, res) => {
@@ -143,7 +154,7 @@ app.post('/logout', (req, res) => {
 app.get('/register', (req, res) => {
   // let templateVars = { username: req.cookies['username'] };
   let user_id = req.cookies.user_id;
-  let templateVars = { user_id : users[user_id]};
+  let templateVars = { user_id: users[user_id] };
   res.render('registration', templateVars);
 });
 
