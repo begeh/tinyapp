@@ -139,7 +139,7 @@ app.post('/login', (req, res) => {
     }
   } else {
     res.statusCode = 403;
-    res.send("ERROR 403: Incomplete/incorrect credentials");
+    res.send("ERROR 403: Account does not exist or you've left a field incomplete.");
   }
 
 });
