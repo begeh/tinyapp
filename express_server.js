@@ -25,10 +25,20 @@ const users = {
     email: "user2@example.com",
     password: "dishwasher-funk"
   }
-}
+};
 
 function generateRandomString() {
   return Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);
+}
+
+const validateUser = (email) => {
+  let keys = Object.keys(users);
+  for (item of keys) {
+    if (users[item].email === email) {
+      return true
+    }
+  }
+  return false;
 }
 
 app.post('/urls', (req, res) => {
@@ -107,6 +117,14 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
+  if (req.body.email === '' || req.body.password === '') {
+    res.statusCode = 400;
+    res.send("Error 400: Email/Password not submitted");
+  }
+  if (validateUser(req.body.email)) {
+    res.statusCode = 400;
+    res.send("Error 400: Email already has a user");
+  }
   let id = generateRandomString();
   users[id] = {};
   users[id].id = id;
