@@ -67,7 +67,6 @@ app.post('/urls', (req, res) => {
 });
 
 app.get('/urls/new', (req, res) => {
-  // let templateVars = { username: req.cookies['username'] };
   let user_id = req.cookies.user_id;
   let templateVars = { user_id: users[user_id] };
   res.render('urls_new', templateVars);
@@ -87,7 +86,6 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    // username: req.cookies['username']
     user_id: users[user_id]
   };
   if (templateVars.longURL === undefined) {
@@ -152,7 +150,6 @@ app.post('/logout', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  // let templateVars = { username: req.cookies['username'] };
   let user_id = req.cookies.user_id;
   let templateVars = { user_id: users[user_id] };
   res.render('registration', templateVars);
