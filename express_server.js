@@ -124,8 +124,14 @@ app.post('/urls/:shortURL', (req, res) => {
   res.redirect('/urls');
 });
 
+app.get('/login',(req,res) =>{
+  let user_id = req.cookies.user_id;
+  let templateVars ={ user_id : users[user_id]};
+  res.render('login',templateVars);
+});
+
 app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
+  res.cookie('user_id', req.body.user_id);
   res.redirect('/urls');
 });
 
@@ -136,9 +142,9 @@ app.post('/logout', (req, res) => {
 
 app.get('/register', (req, res) => {
   // let templateVars = { username: req.cookies['username'] };
-  // let user_id = req.cookies.user_id;
-  // let templateVars = { user_id : users[user_id]};
-  res.render('registration');
+  let user_id = req.cookies.user_id;
+  let templateVars = { user_id : users[user_id]};
+  res.render('registration', templateVars);
 });
 
 app.listen(PORT, () => {

@@ -19,11 +19,17 @@
           class="btn btn-primary" />
       </form>
       <% } else {%>
-      <form class="form-inline" method="POST" action="/login">
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a class="nav-item nav-link" href="/login">Login</a>
+            <a class="nav-item nav-link" href="/register">Register</a>
+          </div>
+        </div>
+      <!-- <form class="form-inline" method="POST" action="/login">
         <input class="form-control" type="text" name="username" placeholder="Username" style="width: 300px; margin-right: 1em">
         <input type="submit" value="Login" style='background-color:transparent; color:black; border-color: black' class="btn btn-primary" />
       </form>
-      <% } %>
+      <% } %> -->
     </div>
   </nav>
 </header>
