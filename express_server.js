@@ -14,6 +14,19 @@ const urlDatabase = {
   '9sm5xk': 'http://www.google.com'
 };
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
+
 function generateRandomString() {
   return Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);
 }
@@ -83,16 +96,26 @@ app.post('/login', (req, res) => {
   res.redirect('/urls');
 });
 
-app.post('/logout',(req, res) =>{
-  res.clearCookie('username',{path:'/'});
+app.post('/logout', (req, res) => {
+  res.clearCookie('username', { path: '/' });
   res.redirect('/urls');
 });
 
-app.get('/register',(req, res) =>{
+app.get('/register', (req, res) => {
   let templateVars = { username: req.cookies['username'] };
-  res.render('registration',templateVars);
-})
+  res.render('registration', templateVars);
+});
+
+app.post('/register', (req, res) => {
+  let id = generateRandomString();
+  users[id] = {};
+  users[id].id = id;
+  users[id].email = req.body.email;
+  users[id].password = req.body.password;
+  res.cookie('user_id', id);
+  res.redirect('/urls');
+});
 
 app.listen(PORT, () => {
-   console.log(`Example app listening on port ${PORT}!`);
+  console.log(`Example app listening on port ${PORT}!`);
 });
