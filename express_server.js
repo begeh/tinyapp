@@ -79,7 +79,7 @@ app.post('/urls/:shortURL', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  res.clearCookie('username', req.body.username);
+  res.cookie('username', req.body.username);
   res.redirect('/urls');
 });
 
