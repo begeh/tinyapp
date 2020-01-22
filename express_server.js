@@ -41,6 +41,24 @@ const validateUser = (email) => {
   return false;
 }
 
+app.post('/register', (req, res) => {
+  if (req.body.email === '' || req.body.password === '') {
+    res.statusCode = 400;
+    res.send("Error 400: Email/Password not submitted");
+  }
+  if (validateUser(req.body.email)) {
+    res.statusCode = 400;
+    res.send("Error 400: Email already has a user");
+  }
+  let id = generateRandomString();
+  users[id] = {};
+  users[id].id = id;
+  users[id].email = req.body.email;
+  users[id].password = req.body.password;
+  res.cookie('user_id', id);
+  res.redirect('/urls');
+});
+
 app.post('/urls', (req, res) => {
   let short = generateRandomString();
   urlDatabase[short] = req.body.longURL;
@@ -49,23 +67,28 @@ app.post('/urls', (req, res) => {
 });
 
 app.get('/urls/new', (req, res) => {
-  let templateVars = { username: req.cookies['username'] };
+  // let templateVars = { username: req.cookies['username'] };
+  let user_id = req.cookies.user_id;
+  let templateVars ={ user_id : users[user_id]};
   res.render('urls_new', templateVars);
 });
 
 app.get('/urls', (req, res) => {
+  let user_id = req.cookies.user_id;
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies['username']
+    user_id : users[user_id]
   };
   res.render('url_index', templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
+  let user_id = req.cookies.user_id;
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies['username']
+    // username: req.cookies['username']
+    user_id : users[user_id]
   };
   if (templateVars.longURL === undefined) {
     res.status(404);
@@ -107,31 +130,15 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('username', { path: '/' });
+  res.clearCookie('user_id', { path: '/' });
   res.redirect('/urls');
 });
 
 app.get('/register', (req, res) => {
-  let templateVars = { username: req.cookies['username'] };
-  res.render('registration', templateVars);
-});
-
-app.post('/register', (req, res) => {
-  if (req.body.email === '' || req.body.password === '') {
-    res.statusCode = 400;
-    res.send("Error 400: Email/Password not submitted");
-  }
-  if (validateUser(req.body.email)) {
-    res.statusCode = 400;
-    res.send("Error 400: Email already has a user");
-  }
-  let id = generateRandomString();
-  users[id] = {};
-  users[id].id = id;
-  users[id].email = req.body.email;
-  users[id].password = req.body.password;
-  res.cookie('user_id', id);
-  res.redirect('/urls');
+  // let templateVars = { username: req.cookies['username'] };
+  // let user_id = req.cookies.user_id;
+  // let templateVars = { user_id : users[user_id]};
+  res.render('registration');
 });
 
 app.listen(PORT, () => {
