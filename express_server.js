@@ -5,7 +5,7 @@ const PORT = 8080;
 const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
 
-const getUserByEmail = require('./helper');
+const { getUserByEmail } = require('./helper');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({
@@ -135,7 +135,11 @@ app.get('/hello', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('Hello!');
+  if(req.session.user_id){
+    res.redirect('/urls');
+  } else{
+    res.redirect('/login');
+  }
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
