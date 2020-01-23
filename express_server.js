@@ -33,10 +33,12 @@ const users = {
   }
 };
 
+//Generates random string for shortURL key and user ID
 const generateRandomString = () => {
   return Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);
 };
 
+//Filters through database and returns new object with only URLs attached to the user ID passed to the function
 const urlsForUser = (id) => {
   let keys = Object.keys(urlDatabase);
   let obj = {};
@@ -48,20 +50,24 @@ const urlsForUser = (id) => {
   return obj;
 };
 
+//Renders registration page
 app.get('/register', (req, res) => {
-  let user_id = req.session.user_id;
-  let templateVars = { user_id: users[user_id] };
+  if (req.session.user_id) {
+    res.redirect('/urls');
+  }
+  let templateVars = { user_id: users[req.session.user_id] };
   res.render('registration', templateVars);
 });
 
+//Creates new account from registration page
 app.post('/register', (req, res) => {
   if (req.body.email === '' || req.body.password === '') {
     res.statusCode = 400;
-    res.send('<html><body><h1>Error 400: Email/Password not submitted</h1></body></html>');
+    res.send('<html><body><h1>Error 400: Email/Password not entered. Please resubmit.</h1></body></html>');
   }
   if (getUserByEmail(req.body.email, users)) {
     res.statusCode = 400;
-    res.send('<html><body><h1>Error 400: Email already has a user</h1></body></html>');
+    res.send('<html><body><h1>Error 400: Email already exists for a user.</h1></body></html>');
   }
   let id = generateRandomString();
   users[id] = {};
@@ -72,6 +78,7 @@ app.post('/register', (req, res) => {
   res.redirect('/urls');
 });
 
+//Renders page for 'My URLS' for logged in user. Redirects otherwise
 app.get('/urls', (req, res) => {
   let user_id = req.session.user_id;
   let list = urlsForUser(user_id);
@@ -83,6 +90,10 @@ app.get('/urls', (req, res) => {
 });
 
 app.post('/urls', (req, res) => {
+  if (!req.session.user_id) {
+    res.statusCode = 403;
+    res.send('<html><body><h1>Error 403: You must login to access this page.</h1></body></html>');
+  }
   let longURL = req.body.longURL;
   if (!longURL.startsWith('http://') && !longURL.startsWith('https://')) {
     longURL = "http://" + longURL;
@@ -157,20 +168,37 @@ app.get('/', (req, res) => {
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
+  if (!req.session.user_id) {
+    res.statusCode = 403;
+    res.send('<html><body><h1>Error 403: You must login to access this page.</h1></body></html>');
+  }
+  if (urlDatabase[req.params.shortURL] === undefined) {
+    res.statusCode = 404;
+    res.send('<html><body><h1>Error 404: This URL does not exist</h1></body></html>');
+  }
   if (urlDatabase[req.params.shortURL].userID === req.session.user_id) {
     delete urlDatabase[req.params.shortURL];
+    res.redirect('/urls');
   }
-  res.redirect('/urls');
 });
 
 app.post('/urls/:shortURL', (req, res) => {
-  if (urlDatabase[req.params.shortURL].userID === req.session.user_id) {
-    urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+  if (!req.session.user_id) {
+    res.statusCode = 403;
+    res.send('<html><body><h1>Error 403: You must login to access this page.</h1></body></html>');
   }
+  if (urlDatabase[req.params.shortURL].userID !== req.session.user_id) {
+    res.statusCode = 403;
+    res.send('<html><body><h1>Error 403: This URL does not belong to you.</h1></body></html>');
+  }
+  urlDatabase[req.params.shortURL].longURL = req.body.longURL;
   res.redirect('/urls');
 });
 
 app.get('/login', (req, res) => {
+  if (req.session.user_id) {
+    res.redirect('/urls');
+  }
   let user_id = req.session.user_id;
   let templateVars = { user_id: users[user_id] };
   res.render('login', templateVars);
@@ -187,7 +215,7 @@ app.post('/login', (req, res) => {
     }
   } else {
     res.statusCode = 403;
-    res.send("<html><body><h1>ERROR 403: Account does not exist or you've left a field incomplete.</h1></body></html>");
+    res.send("<html><body><h1>ERROR 403: Account either does not exist or you've left a field incomplete.</h1></body></html>");
   }
 });
 
