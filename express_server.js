@@ -62,8 +62,8 @@ app.get('/register', (req, res) => {
 //Creates new account from registration page
 app.post('/register', (req, res) => {
   if (req.body.email === '' || req.body.password === '') {
-    res.statusCode = 400;
-    res.send('<html><body><h1>Error 400: Email/Password not entered. Please resubmit.</h1></body></html>');
+    res.statusCode = 403;
+    res.send("<html><body><h1>ERROR 403: Incomplete credentials. Please re-enter.</h1></body></html>");
   }
   if (getUserByEmail(req.body.email, users)) {
     res.statusCode = 400;
@@ -89,6 +89,7 @@ app.get('/urls', (req, res) => {
   res.render('url_index', templateVars);
 });
 
+//Creates a new URL from the 'Create New URL' (url_new) page and redirects to url_show to display the new URL pair
 app.post('/urls', (req, res) => {
   if (!req.session.user_id) {
     res.statusCode = 403;
@@ -106,6 +107,7 @@ app.post('/urls', (req, res) => {
   res.redirect(newURL);
 });
 
+//Renders 'Create New URL' page
 app.get('/urls/new', (req, res) => {
   let user_id = req.session.user_id;
   let templateVars = { user_id: users[user_id] };
@@ -117,6 +119,7 @@ app.get('/urls/new', (req, res) => {
   }
 });
 
+//Renders new page for newly created URL key pair (url_show)
 app.get("/urls/:shortURL", (req, res) => {
   let user_id = req.session.user_id;
   if (urlDatabase[req.params.shortURL] === undefined) {
@@ -139,6 +142,7 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+//Redirects to webpage (longURL) associated with shortURL in the URL
 app.get("/u/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL] === undefined) {
     res.statusCode = 404;
@@ -151,13 +155,6 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(templateVars.longURL);
 });
 
-app.get('/urls-json', (req, res) => {
-  res.json(urlDatabase);
-});
-
-app.get('/hello', (req, res) => {
-  res.send('<html><body><h1>Hello <b>World</b></h1></body></html>\n');
-});
 
 app.get('/', (req, res) => {
   if (req.session.user_id) {
@@ -182,6 +179,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   }
 });
 
+//Updates shortURL with new URL
 app.post('/urls/:shortURL', (req, res) => {
   if (!req.session.user_id) {
     res.statusCode = 403;
@@ -195,6 +193,7 @@ app.post('/urls/:shortURL', (req, res) => {
   res.redirect('/urls');
 });
 
+//Renders login page
 app.get('/login', (req, res) => {
   if (req.session.user_id) {
     res.redirect('/urls');
@@ -204,21 +203,30 @@ app.get('/login', (req, res) => {
   res.render('login', templateVars);
 });
 
+//Logins in based on input on login page (returns appropriate response if invalid data entered)
 app.post('/login', (req, res) => {
   if (getUserByEmail(req.body.email, users)) {
     if (bcrypt.compareSync(req.body.password, getUserByEmail(req.body.email, users).password)) {
       req.session.user_id = getUserByEmail(req.body.email, users).id;
       res.redirect('/urls');
+    } else if (req.body.password === '') {
+      res.statusCode = 403;
+      res.send("<html><body><h1>ERROR 403: Incomplete credentials. Please re-enter.</h1></body></html>");
     } else {
       res.statusCode = 403;
       res.send('<html><body><h1>ERROR 403: Password does not match</body></h1></html>');
     }
-  } else {
+  } else if (req.body.email === '' || req.body.password === '') {
     res.statusCode = 403;
-    res.send("<html><body><h1>ERROR 403: Account either does not exist or you've left a field incomplete.</h1></body></html>");
+    res.send("<html><body><h1>ERROR 403: Incomplete credentials. Please re-enter.</h1></body></html>");
+  }
+  else {
+    res.statusCode = 404;
+    res.send("<html><body><h1>ERROR 404: User not found.</h1></body></html>");
   }
 });
 
+//When Logout is clicked, destroys session and redirects to homepage
 app.post('/logout', (req, res) => {
   req.session.user_id = null;
   res.redirect('/urls');
