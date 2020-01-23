@@ -71,9 +71,13 @@ app.post('/register', (req, res) => {
 });
 
 app.post('/urls', (req, res) => {
+  let longURL = req.body.longURL;
+  if(!longURL.startsWith('http://') && !longURL.startsWith('https://')){
+    longURL = "http://" + longURL;
+  }
   let short = generateRandomString();
   urlDatabase[short] = {};
-  urlDatabase[short].longURL = req.body.longURL;
+  urlDatabase[short].longURL = longURL;
   urlDatabase[short].userID = req.cookies.user_id;
   let newURL = `/urls/${short}`;
   res.redirect(newURL);
@@ -113,7 +117,11 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  console.log(urlDatabase)
+  let templateVars = {
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL].longURL
+  };
   res.redirect(templateVars.longURL);
 });
 
@@ -133,7 +141,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   if (urlDatabase[req.params.shortURL].userID === req.cookies.user_id) {
     delete urlDatabase[req.params.shortURL];
   }
-    res.redirect('/urls');
+  res.redirect('/urls');
 });
 
 app.post('/urls/:shortURL', (req, res) => {
