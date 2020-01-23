@@ -5,6 +5,8 @@ const PORT = 8080;
 const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
 
+const getUserByEmail = require('./helper');
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'user_id',
@@ -33,14 +35,6 @@ const users = {
 
 const generateRandomString = () => {
   return Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);
-};
-
-const getUserByEmail = (email, database) => {
-  for(let key in database){
-    if(database[key].email === email){
-      return key;
-    }
-  }
 };
 
 const urlsForUser = (id) => {
@@ -109,7 +103,6 @@ app.get('/urls/new', (req, res) => {
   }
   res.redirect('/urls');
 });
-
 
 app.get("/urls/:shortURL", (req, res) => {
   let user_id = req.session.user_id;
