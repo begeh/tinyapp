@@ -7,9 +7,9 @@ const bodyParser = require('body-parser');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({
-  name: 'session',
+  name: 'user_id',
   keys: ['key1', 'key2']
-}))
+}));
 
 app.set('view engine', 'ejs');
 
@@ -31,24 +31,22 @@ const users = {
   }
 };
 
-function generateRandomString() {
+const generateRandomString = () => {
   return Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);
-}
+};
 
-const validateUser = (email) => {
-  let keys = Object.keys(users);
-  for (item of keys) {
-    if (users[item].email === email) {
-      return item;
+const getUserByEmail = (email, database) => {
+  for(let key in database){
+    if(database[key].email === email){
+      return key;
     }
   }
-  return false;
-}
+};
 
 const urlsForUser = (id) => {
   let keys = Object.keys(urlDatabase);
   let obj = {};
-  for (item of keys) {
+  for (let item of keys) {
     if (urlDatabase[item].userID === id) {
       obj[item] = urlDatabase[item];
     }
@@ -56,12 +54,18 @@ const urlsForUser = (id) => {
   return obj;
 };
 
+app.get('/register', (req, res) => {
+  let user_id = req.session.user_id;
+  let templateVars = { user_id: users[user_id] };
+  res.render('registration', templateVars);
+});
+
 app.post('/register', (req, res) => {
   if (req.body.email === '' || req.body.password === '') {
     res.statusCode = 400;
     res.send("Error 400: Email/Password not submitted");
   }
-  if (validateUser(req.body.email)) {
+  if  (getUserByEmail(req.body.email, users)) {
     res.statusCode = 400;
     res.send("Error 400: Email already has a user");
   }
@@ -71,8 +75,17 @@ app.post('/register', (req, res) => {
   users[id].email = req.body.email;
   users[id].password = bcrypt.hashSync(req.body.password, 10);
   req.session.user_id = id;
-  console.log(req.session.user_id);
   res.redirect('/urls');
+});
+
+app.get('/urls', (req, res) => {
+  let user_id = req.session.user_id;
+  let list = urlsForUser(user_id);
+  let templateVars = {
+    urls: list,
+    user_id: users[user_id]
+  };
+  res.render('url_index', templateVars);
 });
 
 app.post('/urls', (req, res) => {
@@ -97,15 +110,6 @@ app.get('/urls/new', (req, res) => {
   res.redirect('/urls');
 });
 
-app.get('/urls', (req, res) => {
-  let user_id = req.session.user_id;
-  let list = urlsForUser(user_id);
-  let templateVars = {
-    urls: list,
-    user_id: users[user_id]
-  };
-  res.render('url_index', templateVars);
-});
 
 app.get("/urls/:shortURL", (req, res) => {
   let user_id = req.session.user_id;
@@ -129,16 +133,16 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(templateVars.longURL);
 });
 
-app.get('/', (req, res) => {
-  res.send('Hello!');
-});
-
 app.get('/urls-json', (req, res) => {
   res.json(urlDatabase);
 });
 
 app.get('/hello', (req, res) => {
   res.send('<html><body>Hello <b>World</b></body></html>\n');
+});
+
+app.get('/', (req, res) => {
+  res.send('Hello!');
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
@@ -149,9 +153,6 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 });
 
 app.post('/urls/:shortURL', (req, res) => {
-  console.log(req.session.user_id);
-  console.log(urlDatabase);
-  console.log(users);
   if (urlDatabase[req.params.shortURL].userID === req.session.user_id) {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
   }
@@ -165,30 +166,23 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  if (validateUser(req.body.email)) {
-    if (bcrypt.compareSync(req.body.password, users[validateUser(req.body.email)].password)) {
-      req.session.user_id = validateUser(req.body.email);
+  if (getUserByEmail(req.body.email, users)) {
+    if (bcrypt.compareSync(req.body.password, users[getUserByEmail(req.body.email, users)].password)) {
+      req.session.user_id = getUserByEmail(req.body.email, users);
       res.redirect('/urls');
     } else {
       res.statusCode = 403;
-      res.send('ERROR 403: Password does not match')
+      res.send('ERROR 403: Password does not match');
     }
   } else {
     res.statusCode = 403;
     res.send("ERROR 403: Account does not exist or you've left a field incomplete.");
   }
-
 });
 
 app.post('/logout', (req, res) => {
   req.session.user_id = null;
   res.redirect('/urls');
-});
-
-app.get('/register', (req, res) => {
-  let user_id = req.session.user_id;
-  let templateVars = { user_id: users[user_id] };
-  res.render('registration', templateVars);
 });
 
 app.listen(PORT, () => {
