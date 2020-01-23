@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const bcrypt = require('bcrypt');
 const PORT = 8080; //default port 8080
 var cookieParser = require('cookie-parser')
 
@@ -65,7 +66,7 @@ app.post('/register', (req, res) => {
   users[id] = {};
   users[id].id = id;
   users[id].email = req.body.email;
-  users[id].password = req.body.password;
+  users[id].password = bcrypt.hashSync(req.body.password, 10);
   res.cookie('user_id', id);
   res.redirect('/urls');
 });
@@ -117,7 +118,6 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  console.log(urlDatabase)
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL
@@ -159,7 +159,7 @@ app.get('/login', (req, res) => {
 
 app.post('/login', (req, res) => {
   if (validateUser(req.body.email)) {
-    if (req.body.password === users[validateUser(req.body.email)].password) {
+    if (bcrypt.compareSync(req.body.password, users[validateUser(req.body.email)].password)) {
       res.cookie('user_id', validateUser(req.body.email));
       res.redirect('/urls');
     } else {
