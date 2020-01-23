@@ -160,8 +160,8 @@ app.get('/login', (req, res) => {
 
 app.post('/login', (req, res) => {
   if (getUserByEmail(req.body.email, users)) {
-    if (bcrypt.compareSync(req.body.password, users[getUserByEmail(req.body.email, users)].password)) {
-      req.session.user_id = getUserByEmail(req.body.email, users);
+    if (bcrypt.compareSync(req.body.password, getUserByEmail(req.body.email, users).password)) {
+      req.session.user_id = getUserByEmail(req.body.email, users).id;
       res.redirect('/urls');
     } else {
       res.statusCode = 403;
