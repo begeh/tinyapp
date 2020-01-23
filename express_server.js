@@ -57,11 +57,11 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
   if (req.body.email === '' || req.body.password === '') {
     res.statusCode = 400;
-    res.send("Error 400: Email/Password not submitted");
+    res.send('<html><body><h1>Error 400: Email/Password not submitted</h1></body></html>');
   }
-  if  (getUserByEmail(req.body.email, users)) {
+  if (getUserByEmail(req.body.email, users)) {
     res.statusCode = 400;
-    res.send("Error 400: Email already has a user");
+    res.send('<html><body><h1>Error 400: Email already has a user</h1></body></html>');
   }
   let id = generateRandomString();
   users[id] = {};
@@ -100,25 +100,39 @@ app.get('/urls/new', (req, res) => {
   let templateVars = { user_id: users[user_id] };
   if (users[user_id]) {
     res.render('urls_new', templateVars);
+    res.redirect('/urls');
+  } else {
+    res.redirect('/login');
   }
-  res.redirect('/urls');
 });
 
 app.get("/urls/:shortURL", (req, res) => {
   let user_id = req.session.user_id;
+  if (urlDatabase[req.params.shortURL] === undefined) {
+    res.statusCode = 404;
+    res.send('<html><body><h1>Error 404: This URL does not exist</h1></body></html>');
+  }
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
     user_id: users[user_id]
   };
-  if (templateVars.longURL === undefined) {
-    res.status(404);
-    res.render("url_error");
+  if (!user_id) {
+    res.statusCode = 403;
+    res.send('<html><body><h1>Error 403: You must login to access this page.</h1></body></html>');
+  }
+  if (user_id && urlDatabase[req.params.shortURL].userID !== user_id) {
+    res.statusCode = 403;
+    res.send('<html><body><h1>Error 403: This URL does not belong to you.</h1></body></html>');
   }
   res.render("urls_show", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
+  if (urlDatabase[req.params.shortURL] === undefined) {
+    res.statusCode = 404;
+    res.send('<html><body><h1>Error 404: This URL does not exist</h1></body></html>');
+  }
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL
@@ -131,13 +145,13 @@ app.get('/urls-json', (req, res) => {
 });
 
 app.get('/hello', (req, res) => {
-  res.send('<html><body>Hello <b>World</b></body></html>\n');
+  res.send('<html><body><h1>Hello <b>World</b></h1></body></html>\n');
 });
 
 app.get('/', (req, res) => {
-  if(req.session.user_id){
+  if (req.session.user_id) {
     res.redirect('/urls');
-  } else{
+  } else {
     res.redirect('/login');
   }
 });
@@ -169,11 +183,11 @@ app.post('/login', (req, res) => {
       res.redirect('/urls');
     } else {
       res.statusCode = 403;
-      res.send('ERROR 403: Password does not match');
+      res.send('<html><body><h1>ERROR 403: Password does not match</body></h1></html>');
     }
   } else {
     res.statusCode = 403;
-    res.send("ERROR 403: Account does not exist or you've left a field incomplete.");
+    res.send("<html><body><h1>ERROR 403: Account does not exist or you've left a field incomplete.</h1></body></html>");
   }
 });
 

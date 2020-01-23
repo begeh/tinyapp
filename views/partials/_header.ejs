@@ -14,8 +14,8 @@
     <div style="float:right">
       <% if(user_id){ %>
       <form class='form-inline' method="POST" action='/logout'>
-        <h6 style="padding-right: 20px; padding-top: 10px">Logged in as : <%=user_id.email%>!</h6>
-        <input type="submit" value="Logout" style='background-color:transparent;color:black; border-color: black'
+        <h6 style="padding-right: 20px; padding-top: 10px; color: white">Logged in as : <%=user_id.email%>!</h6>
+        <input type="submit" value="Logout" style='background-color:transparent;color:white; border-color: yellow'
           class="btn btn-primary" />
       </form>
       <% } else {%>
