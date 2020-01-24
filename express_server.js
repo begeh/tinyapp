@@ -190,7 +190,11 @@ app.post('/urls/:shortURL', (req, res) => {
     res.statusCode = 403;
     res.send('<html><body><h1>Error 403: This URL does not belong to you.</h1></body></html>');
   }
-  urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+  let longURL = req.body.longURL;
+  if (!longURL.startsWith('http://') && !longURL.startsWith('https://')) {
+    longURL = "http://" + longURL;
+  }
+  urlDatabase[req.params.shortURL].longURL = longURL;
   res.redirect('/urls');
 });
 
