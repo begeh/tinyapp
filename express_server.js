@@ -107,7 +107,7 @@ app.post('/urls', (req, res) => {
   res.redirect(newURL);
 });
 
-//Renders 'Create New URL' page
+//Renders 'Create New URL' page or redirects to login if not logged in
 app.get('/urls/new', (req, res) => {
   let user_id = req.session.user_id;
   let templateVars = { user_id: users[user_id] };
@@ -219,8 +219,7 @@ app.post('/login', (req, res) => {
   } else if (req.body.email === '' || req.body.password === '') {
     res.statusCode = 403;
     res.send("<html><body><h1>ERROR 403: Incomplete credentials. Please re-enter.</h1></body></html>");
-  }
-  else {
+  } else {
     res.statusCode = 404;
     res.send("<html><body><h1>ERROR 404: User not found.</h1></body></html>");
   }
