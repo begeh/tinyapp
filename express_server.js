@@ -155,7 +155,7 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(templateVars.longURL);
 });
 
-
+//Redirects '/' to the login page
 app.get('/', (req, res) => {
   if (req.session.user_id) {
     res.redirect('/urls');
@@ -164,14 +164,15 @@ app.get('/', (req, res) => {
   }
 });
 
+//Deletes a URL from a person's list of urls
 app.post('/urls/:shortURL/delete', (req, res) => {
+  if (!urlDatabase[req.params.shortURL]) {
+    res.statusCode = 404;
+    res.send('<html><body><h1>Error 404: This URL does not exist</h1></body></html>');
+  }
   if (!req.session.user_id) {
     res.statusCode = 403;
     res.send('<html><body><h1>Error 403: You must login to access this page.</h1></body></html>');
-  }
-  if (urlDatabase[req.params.shortURL] === undefined) {
-    res.statusCode = 404;
-    res.send('<html><body><h1>Error 404: This URL does not exist</h1></body></html>');
   }
   if (urlDatabase[req.params.shortURL].userID === req.session.user_id) {
     delete urlDatabase[req.params.shortURL];
