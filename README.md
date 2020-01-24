@@ -4,8 +4,10 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["Screenshot of URLs page"](https://github.com/begeh/tinyapp/blob/master/docs/my-url%20-page.png?raw=true)
-!["Screenshot of register page"](https://github.com/begeh/tinyapp/blob/master/docs/register-page.png?raw=true)
+!["Screenshot of Page While Logged Out"](https://github.com/begeh/tinyapp/blob/master/docs/homepage.png?raw=true)
+!["Screenshot of Registration page"](https://github.com/begeh/tinyapp/blob/master/docs/register-page.png?raw=true)
+!["Screenshot of My-URLs Page"](https://github.com/begeh/tinyapp/blob/master/docs/my-url%20-page.png?raw=true)
+!["Screenshot of URL Page"](https://github.com/begeh/tinyapp/blob/master/docs/url-page.png?raw=true)
 
 ## Dependencies
 
