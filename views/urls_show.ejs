@@ -17,7 +17,7 @@
       <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
       <h5 style='text-align: center;font-weight: bold; color: rgba(20, 19, 19, 0.705)'>Edit</h5>
       <div style='display:flex; justify-content: center; background-color:gainsboro'>
-        <form class='form-inline' action="/urls/<%=shortURL%>" method="POST">
+        <form class='form-inline' action="/urls/<%=shortURL%>?_method=PUT" method="POST">
           <div class="form-group mb-2">
             <label for="longURL">Update URL:</label>
             <input class="form-control" type="text" name="longURL" placeholder="http://"

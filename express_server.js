@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const PORT = 8080;
 const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
+const methodOverride = require('method-override')
 
 const { getUserByEmail } = require('./helper');
 
@@ -12,6 +13,7 @@ app.use(cookieSession({
   name: 'user_id',
   keys: ['key1', 'key2']
 }));
+app.use(methodOverride('_method'));
 
 app.set('view engine', 'ejs');
 
@@ -165,7 +167,7 @@ app.get('/', (req, res) => {
 });
 
 //Deletes a URL from a person's list of urls
-app.post('/urls/:shortURL/delete', (req, res) => {
+app.delete('/urls/:shortURL', (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
     res.statusCode = 404;
     res.send('<html><body><h1>Error 404: This URL does not exist</h1></body></html>');
@@ -181,7 +183,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 });
 
 //Updates shortURL with new URL
-app.post('/urls/:shortURL', (req, res) => {
+app.put('/urls/:shortURL', (req, res) => {
   if (!req.session.user_id) {
     res.statusCode = 403;
     res.send('<html><body><h1>Error 403: You must login to access this page.</h1></body></html>');
