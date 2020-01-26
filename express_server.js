@@ -105,6 +105,7 @@ app.post('/urls', (req, res) => {
   urlDatabase[short] = {};
   urlDatabase[short].longURL = longURL;
   urlDatabase[short].userID = req.session.user_id;
+  urlDatabase[short].date = Date();
   let newURL = `/urls/${short}`;
   res.redirect(newURL);
 });
