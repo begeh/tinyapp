@@ -14,7 +14,8 @@
     <div class="card-header"></div>
     <div class="card-body">
       <h5 class="card-title">TinyURL for: <%= longURL %></h5>
-      <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
+      <p class="card-text">Short URL: <a href="/u/<%= shortURL %>">&nbsp;<%= shortURL %></a></p>
+      <p style = 'text-align: center'><u>Created on:</u> &nbsp; <%= date %></p>
       <h5 style='text-align: center;font-weight: bold; color: rgba(20, 19, 19, 0.705)'>Edit</h5>
       <div style='display:flex; justify-content: center; background-color:gainsboro'>
         <form class='form-inline' action="/urls/<%=shortURL%>?_method=PUT" method="POST">

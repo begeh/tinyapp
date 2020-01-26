@@ -132,7 +132,8 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
-    user_id: users[user_id]
+    user_id: users[user_id],
+    date: urlDatabase[req.params.shortURL].date
   };
   if (!user_id) {
     res.statusCode = 403;
